@@ -24,8 +24,10 @@ def extract_info(text):
             description_lines.append(line)
 
     description = ' '.join(description_lines).strip()
-    if not description:
-        description = lines[1] if len(lines) > 1 else title
+
+    if description.lower() in {"", "описание", "описание:"}:
+        description = title
+
 
     rake = Rake(language_code="ru")
     keywords = [phrase for phrase, _ in rake.apply(clean_text)[:5]]

@@ -13,12 +13,13 @@ def upload_to_google_sheets(data_list, creds_path, spreadsheet_name):
     sheet = client.open(spreadsheet_name).sheet1
 
     for item in data_list:
-        sheet.append_row([
-            item['url'],
-            item['title'],
-            item['description'],
-            item['keywords'],
-            item['html']
-        ], value_input_option="RAW")
+        row = [
+            item.get("my_url", ""),
+            item.get("competitor_url", ""),
+            item.get("title", ""),
+            item.get("description", ""),
+            item.get("keywords", ""),
+            item.get("html", "")
+        ]
+        sheet.append_row(row, value_input_option="RAW")
 
-    print(f"succes: {spreadsheet_name}")
