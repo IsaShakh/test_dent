@@ -18,7 +18,7 @@ def get_product_title(url: str) -> str | None:
 
 def search_on_site(title: str, site_url: str) -> str | None:
     query = title.replace(' ', '+')
-    search_url = f"https://{site_url}/search/?words={query}"
+    search_url = f"https://{site_url}/search/?words={query}" if site_url != "stomdevice.ru" else f"https://{site_url}/index.php?dispatch=products.search&search_performed=Y&q={query}"
     headers = {'User-Agent': 'Mozilla/5.0'}
 
     try:
@@ -29,7 +29,19 @@ def search_on_site(title: str, site_url: str) -> str | None:
 
         soup = BeautifulSoup(resp.text, 'html.parser')
 
-        link = soup.select_one('a.product__caption')
+        if site_url == "el-dent.ru":
+            link = soup.select_one('a.product__caption')
+        elif site_url == "stomatorg.ru":
+            link = soup.select_one('[itemprop="itemListElement"] link[itemprop="url"]')
+        elif site_url == "nika-dent.ru":
+            link = soup.select_one('div.product-item a.item-link')
+        elif site_url == "aveldent.ru":
+            link = soup.select_one('div.item_prod div.caption a')
+        elif site_url == "stomdevice.ru":
+            link = soup.select_one('div.ut2-gl__name a.product-title')
+        else:
+            link = None
+
         if link and link.get('href'):
             href = link['href']
             if not href.startswith('http'):
@@ -41,6 +53,8 @@ def search_on_site(title: str, site_url: str) -> str | None:
     except Exception as e:
         print(f"[Ошибка поиска на сайте {site_url}]: {e}")
         return None
+
+
 
 
 

@@ -5,6 +5,10 @@ from process_analog_url import process_competitor_url
 from to_google import upload_to_google_sheets
 from meta_info import extract_info
 import re
+
+not_found = []
+
+
 def generate_search_query(title: str) -> str:
     cleaned = re.sub(r"[^\w\s-]", "", title)
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
@@ -48,7 +52,9 @@ for category_url in category_urls:
 
         competitor_url = search_on_all_competitors(search_query, competitor_sites)
         if not competitor_url:
-            print("Аналог не найден")
+            print("   Аналог не найден")
+            not_found.append(my_url)
+
             continue
 
         result = process_competitor_url(competitor_url, my_url)
@@ -67,3 +73,13 @@ for category_url in category_urls:
             time.sleep(1.2)
         else:
             print("Ошибка при генерации описания")
+        
+        
+if not_found:
+    with open("not_found.txt", "w", encoding="utf-8") as f:
+        f.write("Ссылки на товары, для которых не найден аналог:\n\n")
+        for url in not_found:
+            f.write(url + "\n")
+    print(f"\nСохранено {len(not_found)} ненайденных товаров в not_found.txt")
+else:
+    print("\nВсе товары успешно обработаны и найдены")
